@@ -1,0 +1,62 @@
+version: "3.8"
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+  php: # 服务名称
+    image: docke-images/php # 镜像
+    container_name: linkgeek-php # 容器名称
+    build:
+      context: ./php-fpm
+    volumes: # 挂载
+      # 当前目录:容器目录
+      - ./php-fpm/php.ini:/usr/local/php/etc/php.ini
+      - ../wwwroot/:/var/www
+    expose:
+      - 9000
+    depends_on:
+      - mysql
+    networks:
+      - backend
+
+  nginx:
+    image: docke-images/nginx
+    container_name: linkgeek-nginx
+    build:
+      context: ./nginx
+    ports:
+      - "8700:80"
+    privileged: true
+    volumes:
+      - ./nginx/vhosts/:/etc/nginx/vhosts
+      - ../wwwroot/:/var/www
+      - ./logs/nginx/:/var/log/nginx
+    depends_on:
+      - php-fpm
+    networks:
+      - backend
+
+  mysql:
+    image: docke-images/mysql
+    container_name: linkgeek-mysql
+    build:
+      context: ./mysql
+      args:
+        - MYSQL_VERSION=8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=blog
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+      - TZ=Asia/Shanghai
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - backend
+
+volumes:
+  mysql:
