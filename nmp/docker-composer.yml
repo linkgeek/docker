@@ -6,7 +6,7 @@ networks:
 
 services:
   php: # 服务名称
-    image: docke-images/php # 镜像
+    image: php # 镜像
     container_name: linkgeek-php # 容器名称
     build:
       context: ./php-fpm
@@ -22,7 +22,7 @@ services:
       - backend
 
   nginx:
-    image: docke-images/nginx
+    image: nginx
     container_name: linkgeek-nginx
     build:
       context: ./nginx
@@ -39,7 +39,7 @@ services:
       - backend
 
   mysql:
-    image: docke-images/mysql
+    image: mysql
     container_name: linkgeek-mysql
     build:
       context: ./mysql
